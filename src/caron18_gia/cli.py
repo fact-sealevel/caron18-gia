@@ -1,6 +1,5 @@
 import click
 import logging
-
 from caron18_gia.caron18_GIA_preprocess import caron18_preprocess_GIA
 from caron18_gia.caron18_GIA_postprocess import caron18_postprocess_GIA
 
@@ -47,6 +46,21 @@ logger = logging.getLogger(__name__)
     default=1000,
     help="Number of locations to process in each chunk",
 )
+@click.option(
+    "--output-lslr-file",
+    required=False,
+    type=str,
+    default="caron18_gia_lsrl_results.nc",
+    help="Output file for local sea level rise results",
+)
+@click.option(
+    "--output-quantiles-file",
+    required=False,
+    type=str,
+    default="caron18_gia_quantiles.nc",
+    help="Output file for quantiles results",
+)
+
 def main(
     pipeline_id: str,
     gia_stats_input_file: str,
@@ -58,11 +72,16 @@ def main(
     pyear_start: int,
     pyear_end: int,
     pyear_step: int,
+    output_lslr_file: str,
+    output_quantiles_file: str,
 ) -> None:
+    click.echo("Hello from caron18-gia!")
+
     logger.info("Starting preprocessing...")
     preprocess_dict = caron18_preprocess_GIA(
         pipeline_id, gia_rate_file=gia_stats_input_file
     )
+
     logger.info("Starting postprocessing...")
     caron18_postprocess_GIA(
         nsamps,
@@ -71,10 +90,11 @@ def main(
         pyear_start,
         pyear_end,
         pyear_step,
-        location_file,
         chunksize,
         preprocess_dict,
         pipeline_id,
         location_file,
+        output_lslr_file,
+        output_quantiles_file,
     )
     logger.info("Post-processing complete.")

@@ -2,8 +2,7 @@ import numpy as np
 import time
 import argparse
 from scipy.stats import norm
-from read_locationfile import ReadLocationFile
-
+from caron18_gia.read_locationfile import ReadLocationFile
 import xarray as xr
 import dask.array as da
 
@@ -83,11 +82,12 @@ def caron18_postprocess_GIA(
     pyear_start,
     pyear_end,
     pyear_step,
-    locationfilename,
     chunksize,
     preprocess_dict,
     pipeline_id,
     location_file,
+    output_lslr_file,
+    output_quantiles_file,
 ):
     # Read in the data from the preprocessing stage
     # datafile = "{}_data.pkl".format(pipeline_id)
@@ -117,12 +117,12 @@ def caron18_postprocess_GIA(
 
     # Find the nearest points for the query lats/lons
     site_ids_map = np.array(NearestPoints(site_lats, site_lons, lats, lons, tol=None))
-
     # Evenly sample an inverse normal distribution
     rng = np.random.default_rng(rng_seed)
     x = np.linspace(0, 1, nsamps + 2)[1 : (nsamps + 1)]
     norm_inv = norm.ppf(x)
     norm_inv_perm = rng.permutation(norm_inv)
+
 
     # Missing value for netcdf file
     nc_missing_value = np.nan  # np.iinfo(np.int16).min
@@ -139,12 +139,16 @@ def caron18_postprocess_GIA(
     GIAproj = np.multiply.outer(targyears - baseyear, site_rates)
     GIAprojsd = np.multiply.outer(targyears - baseyear, site_sds)
 
+    GIAproj = GIAproj.compute()
+    GIAprojsd = GIAprojsd.compute()
+
     # Produce the samples from the means and standard deviations
     local_sl = GIAproj + np.multiply.outer(norm_inv_perm, GIAprojsd)
+
     local_sl = np.array(
         local_sl
     )  # saving as numpy array is extremely more efficient than dask array
-
+    
     # Create the xarray data structures for the localized projections
     ncvar_attributes = {
         "description": "Local SLR contributions from Glacial Isostatic Adjustment according to Caron 18 workflow",
@@ -174,7 +178,8 @@ def caron18_postprocess_GIA(
 
     # Write the netcdf output file
     vlm_out.to_netcdf(
-        "{0}_localsl.nc".format(pipeline_id),
+        output_lslr_file,
+        #"{0}_localsl.nc".format(pipeline_id),
         encoding={
             "sea_level_change": {
                 "dtype": "f4",
@@ -189,7 +194,8 @@ def caron18_postprocess_GIA(
         [0.01, 0.05, 0.17, 0.50, 0.83, 0.95, 0.99], dim="samples"
     )
     vlm_outq.to_netcdf(
-        "{0}_quantiles.nc".format(pipeline_id),
+        output_quantiles_file,
+       # "{0}_quantiles.nc".format(pipeline_id),
         encoding={
             "sea_level_change": {
                 "dtype": "f4",
