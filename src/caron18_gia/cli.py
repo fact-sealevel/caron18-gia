@@ -60,7 +60,6 @@ logger = logging.getLogger(__name__)
     default="caron18_gia_quantiles.nc",
     help="Output file for quantiles results",
 )
-
 def main(
     pipeline_id: str,
     gia_stats_input_file: str,

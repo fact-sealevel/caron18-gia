@@ -123,7 +123,6 @@ def caron18_postprocess_GIA(
     norm_inv = norm.ppf(x)
     norm_inv_perm = rng.permutation(norm_inv)
 
-
     # Missing value for netcdf file
     nc_missing_value = np.nan  # np.iinfo(np.int16).min
 
@@ -148,7 +147,7 @@ def caron18_postprocess_GIA(
     local_sl = np.array(
         local_sl
     )  # saving as numpy array is extremely more efficient than dask array
-    
+
     # Create the xarray data structures for the localized projections
     ncvar_attributes = {
         "description": "Local SLR contributions from Glacial Isostatic Adjustment according to Caron 18 workflow",
@@ -179,7 +178,7 @@ def caron18_postprocess_GIA(
     # Write the netcdf output file
     vlm_out.to_netcdf(
         output_lslr_file,
-        #"{0}_localsl.nc".format(pipeline_id),
+        # "{0}_localsl.nc".format(pipeline_id),
         encoding={
             "sea_level_change": {
                 "dtype": "f4",
@@ -195,7 +194,7 @@ def caron18_postprocess_GIA(
     )
     vlm_outq.to_netcdf(
         output_quantiles_file,
-       # "{0}_quantiles.nc".format(pipeline_id),
+        # "{0}_quantiles.nc".format(pipeline_id),
         encoding={
             "sea_level_change": {
                 "dtype": "f4",
