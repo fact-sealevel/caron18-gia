@@ -12,6 +12,9 @@ Caron, L., Ivins, E. R., Larour, E., Adhikari, S., Nilsson, J., & Blewitt, G. (2
 This application takes provided input data. Download the data at the following Zenodo record, placing it in a sub-directory of the project root named `./data/input`:
 
 ```shell
+git clone --single-branch --branch package git@github.com:e-marshall/caron18-gia.git
+#TODO: evenutally this won't be necessary in the example.
+
 mkdir -p ./data/input
 curl -sL https://zenodo.org/records/15975768/files/caron18_GIA_preprocess_data.tgz | tar -zx -C ./data/input
 
@@ -21,7 +24,11 @@ echo "New_York	12	40.70	-74.01" > ./data/input/location.lst
 # Make output dir
 mkdir -p ./data/output
 ```
-
+Build image
+```shell
+#TODO evenutually won't need this step in example
+docker build -t caron18-gia .
+```
 Now, run the application, for example in a Docker container as follows:
 ```shell
 docker run --rm \
