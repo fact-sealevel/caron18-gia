@@ -27,7 +27,7 @@ Now, run the application, for example in a Docker container as follows:
 docker run --rm \
 -v ./data/input:/mnt/caron_data_in:ro \
 -v ./data/output:/mnt/caron_data_out \
-caron18-gia \
+ghcr.io/fact-sealevel/caron18-gia:latest \
 --pipeline-id MY_PIPELINE \
 --gia-stats-input-file /mnt/caron_data_in/GIA_stats.nc \
 --rng-seed 1234 \
